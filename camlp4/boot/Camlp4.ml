@@ -15637,12 +15637,12 @@ module Struct =
                   let li = long_type_ident i
                   in mktyp loc (Ptyp_constr (li, []))
               | TyAli (loc, t1, t2) ->
-                  let (t, i) =
+                  let (t, l, i) =
                     (match (t1, t2) with
-                     | (t, TyQuo (_, s)) -> (t, s)
-                     | (TyQuo (_, s), t) -> (t, s)
+                     | (t, TyQuo (l, s)) -> (t, l, s)
+                     | (TyQuo (l, s), t) -> (t, l, s)
                      | _ -> error loc "invalid alias type")
-                  in mktyp loc (Ptyp_alias ((ctyp t), i))
+                  in mktyp loc (Ptyp_alias ((ctyp t), {loc = Location.none; txt = i}))
               | TyAny loc -> mktyp loc Ptyp_any
               | (TyApp (loc, _, _) as f) ->
                   let (f, al) = ctyp_fa [] f in
@@ -16462,7 +16462,7 @@ module Struct =
                   let lab = paolab lab p
                   in
                     mkfun loc (Optional lab) None (patt_of_lab loc lab p) e w
-              | ExFun (loc, a) -> mkexp loc (Pexp_function (match_case a []))
+              | ExFun (loc, a) -> mkexp loc (Pexp_function ([], None, match_case a []))
               | ExIfe (loc, e1, e2, e3) ->
                   mkexp loc
                     (Pexp_ifthenelse ((expr e1), (expr e2), (Some (expr e3))))
